@@ -56,10 +56,10 @@ die() {
 }
 
 # paths to some project directories
-NETWORKS_DIR="data/networks"
-CLASSIFY_DIR="python/training/classification"
-DETECTION_DIR="python/training/detection/ssd"
-RECOGNIZER_DIR="python/www/recognizer"
+NETWORKS_DIR="jetson-inference/data/networks"
+CLASSIFY_DIR="jetson-inference/python/training/classification"
+DETECTION_DIR="jetson-inference/python/training/detection/ssd"
+RECOGNIZER_DIR="jetson-inference/python/www/recognizer"
 
 DOCKER_ROOT="/jetson-inference"	# where the project resides inside docker
 
@@ -153,9 +153,9 @@ done
 
 # select container tag (unless specified by user)
 if [ -z "$CONTAINER_IMAGE" ]; then
-	source docker/tag.sh
+	source jetson-inference/docker/tag.sh
 else
-	source docker/containers/scripts/l4t_version.sh
+	source jetson-inference/docker/containers/scripts/l4t_version.sh
 fi
 
 # check for V4L2 devices
