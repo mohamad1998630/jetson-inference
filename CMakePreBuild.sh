@@ -9,7 +9,7 @@ if [ -f /.dockerenv ]; then
 else
 	BUILD_CONTAINER="NO"
 fi
-
+BUILD_CONTAINER="YES"
 echo "[Pre-build]  dependency installer script running..."
 echo "[Pre-build]  build root directory: $BUILD_ROOT"
 echo "[Pre-build]  build interactive:    $BUILD_INTERACTIVE"
@@ -63,9 +63,9 @@ fi
 pip3 install --no-cache-dir --verbose --upgrade Cython
 
 # download/install models and PyTorch
-if [ $BUILD_CONTAINER = "NO" ]; then
-	#./download-models.sh $BUILD_INTERACTIVE
-	./install-pytorch.sh $BUILD_INTERACTIVE
-fi
+# if [ $BUILD_CONTAINER = "NO" ]; then
+# 	#./download-models.sh $BUILD_INTERACTIVE
+# 	# ./install-pytorch.sh $BUILD_INTERACTIVE
+# fi
 
 echo "[Pre-build]  Finished CMakePreBuild script"
