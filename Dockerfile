@@ -27,7 +27,8 @@
 #     https://github.com/dusty-nv/jetson-containers#docker-default-runtime
 #
 
-ARG BASE_IMAGE=nvcr.io/nvidia/l4t-pytorch:r32.4.3-pth1.6-py3
+
+ARG BASE_IMAGE=nvcr.io/nvidia/pytorch:22.06-py3
 FROM ${BASE_IMAGE}
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -35,11 +36,17 @@ ENV SHELL /bin/bash
 
 WORKDIR /jetson-inference
 
-  
+# Add sudo to the repository
+RUN apt-get update && \
+    apt-get -y install sudo
+
+
 #
 # install development packages
 #
-RUN add-apt-repository --remove "deb https://apt.kitware.com/ubuntu/ $(lsb_release --codename --short) main" && \
+RUN apt-get update && \
+    apt-get install -y software-properties-common && \
+    add-apt-repository --remove "deb https://apt.kitware.com/ubuntu/ $(lsb_release --codename --short) main" && \
     apt-get update && \
     apt-get purge -y '*opencv*' || echo "existing OpenCV installation not found" && \
     apt-get install -y --no-install-recommends \
@@ -82,17 +89,21 @@ RUN pip3 install --no-cache-dir --verbose --upgrade Cython && \
     pip3 install --no-cache-dir --verbose -r /tmp/flask_requirements.txt && \
     pip3 install --no-cache-dir --verbose -r /tmp/dash_requirements.txt
     
-    
+
+#Install pytorch 
+RUN pip3 install torch torchvision torchaudio 
+
+# Install required packages with the --no-deps flag
+COPY requirements.txt /tmp/requirements.txt
+RUN pip3 install --no-deps -r /tmp/requirements.txt      
 # 
 # install OpenCV (with CUDA)
 #
-ARG OPENCV_URL=https://nvidia.box.com/shared/static/5v89u6g5rb62fpz4lh0rz531ajo2t5ef.gz
-ARG OPENCV_DEB=OpenCV-4.5.0-aarch64.tar.gz
-
 COPY docker/containers/scripts/opencv_install.sh /tmp/opencv_install.sh
-RUN cd /tmp && ./opencv_install.sh ${OPENCV_URL} ${OPENCV_DEB}
+# RUN cd /tmp && ./opencv_install.sh ${OPENCV_URL} ${OPENCV_DEB}
+RUN cd /tmp && ./opencv_install.sh 
 
-  
+
 #
 # copy source
 #
@@ -114,7 +125,7 @@ RUN mkdir docs && \
     touch docs/CMakeLists.txt && \
     sed -i 's/nvcaffe_parser/nvparsers/g' CMakeLists.txt && \
     cp -r /usr/local/include/gstreamer-1.0/gst/webrtc /usr/include/gstreamer-1.0/gst && \
-    ln -s /usr/lib/$(uname -m)-linux-gnu/libgstwebrtc-1.0.so.0 /usr/lib/$(uname -m)-linux-gnu/libgstwebrtc-1.0.so && \
+    # ln -s /usr/lib/$(uname -m)-linux-gnu/libgstwebrtc-1.0.so.0 /usr/lib/$(uname -m)-linux-gnu/libgstwebrtc-1.0.so && \
     mkdir build && \
     cd build && \
     cmake ../ && \
