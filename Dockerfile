@@ -99,7 +99,7 @@ RUN pip3 install --no-deps -r /tmp/requirements.txt
 # 
 # install OpenCV (with CUDA)
 #
-COPY docker/containers/scripts/opencv_install.sh /tmp/opencv_install.sh
+COPY docker/opencv_install.sh /tmp/opencv_install.sh
 # RUN cd /tmp && ./opencv_install.sh ${OPENCV_URL} ${OPENCV_DEB}
 RUN cd /tmp && ./opencv_install.sh 
 
